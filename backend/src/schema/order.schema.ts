@@ -1,3 +1,4 @@
+import { request } from "express";
 import z from "zod";
 
 enum Symbol {
@@ -12,7 +13,8 @@ enum Symbol {
 }
 
 const orderSchema  = z.object({
-    id: z.number(),// id
+    requestId: z.number(),// id
+    orderId: z.number(),
     user_id: z.string({message: "user_id must be a string"}),// user_id
     symbol: z.enum(Object.values(Symbol)),
     side : z.enum(["BUY" , "SELL"]),
@@ -23,7 +25,60 @@ const orderSchema  = z.object({
 })
 
 
-type orderBody = z.infer< typeof orderSchema>
+type universalBody = z.infer< typeof orderSchema>
 
 
-export { orderSchema, type orderBody};
+
+export { orderSchema, type universalBody};
+
+
+const createOrderSchema = z.object({
+    requestId: z.number(),
+    event : z.literal("CREATE_ORDER"),
+    data: orderSchema.pick({
+        orderId: true,
+        symbol: true,
+        type: true,
+        side: true,
+        price: true,
+        qty: true
+    })
+
+    
+})
+
+const getDepthSchema = z.object({
+    requestId: z.number(),
+    event: z.literal("GET_DEPTH"),
+    data: orderSchema.pick({
+        symbol: true,
+    })
+})
+
+
+const cancelOrderSchema = z.object({
+    requestId: z.number(),
+    event: z.literal("CANCEL_ORDER"),
+    data: orderSchema.pick({
+        orderId: true,
+
+    })
+})
+
+const getOrderBook = z.object({
+    requestId: z.number(),
+    event: z.literal("GET_ORDERBOOK"),
+    data:orderSchema.pick({
+        symbol: true,
+    })
+    
+})
+
+type createOrderbody = z.infer<typeof createOrderSchema>;
+type cancelOrderbody = z.infer< typeof cancelOrderSchema>;
+type getDepthbody = z.infer< typeof getDepthSchema>
+type getOrderBookbody = z.infer< typeof getOrderBook>
+
+
+
+export { createOrderSchema , cancelOrderSchema, getOrderBook,getDepthSchema, type createOrderbody, type cancelOrderbody, type getDepthbody , type getOrderBookbody};

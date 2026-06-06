@@ -11,6 +11,5 @@ export function authMiddleware( req: Request , res: Response, next : NextFunctio
         throw new AppError("No token provided");
     const id =  verifyToken(token);
     req.id = id;
-    console.log(id);
     next();
 }

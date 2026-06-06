@@ -1,5 +1,5 @@
 import  type { Request, Response } from "express";
-import { orderSchema } from "../schema/order.schema";
+import { createOrderSchema, orderSchema } from "../schema/order.schema";
 import { AppError } from "../utils/AppError";
 import z, { cuid2 } from "zod";
 import { getId } from "../utils/id.generate";
@@ -13,29 +13,33 @@ export async function orderHandler( req: Request, res: Response )
 {
     const { symbol, side, type, price, qty } = req.body;
     const user_id : string | undefined | null  = req.id;
-    console.log(user_id);
     if(!user_id)
         throw new Error("Invalid user"); 
     
-    const id = getId();
-    const parsedOrderBody = orderSchema.safeParse({
-        id, 
-        user_id,
-        symbol,
-        side, 
-        type, 
-        price, 
-        qty
-    
+    const requestId = getId();
+    const orderId = getId();
+    const create_order_body =  createOrderSchema.safeParse({
+        requestId,
+        event: "CREATE_ORDER",
+        data:{
+            orderId,
+            symbol,
+            type,
+            side,
+            price,
+            qty,
+        }
+        
+        
     })
-    if(!parsedOrderBody.success)
-        throw new AppError( z.prettifyError(parsedOrderBody.error));
 
-    await pushRequestOrder(parsedOrderBody.data);
-    console.log("after pushed into order -queue")
+    if(!create_order_body.success)
+        throw new AppError( z.prettifyError(create_order_body.error));
 
-    const filled =  await untilWeBack(id);
-    console.log("after called untilwe back")
+    
+    await pushRequestOrder(create_order_body.data);
+
+    const filled =  await untilWeBack( requestId );
     sendResponse(res, Status.OK, "Order successfully placed", {filled, symbol , price});
     return;
 

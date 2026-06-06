@@ -36,7 +36,6 @@ export async function loginHandler( req: express.Request , res: express.Response
     try{
         const id = await verifyUser(user.data);
         const token = generateToken(id);
-        console.log("token inside login handler "+ token);
         return sendResponse( res, Status.OK, "User logged in successfully", {token});
         
         

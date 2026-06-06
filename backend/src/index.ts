@@ -8,16 +8,34 @@ import { authMiddleware } from "./middlewares/auth.middleware";
 import { sendResponse } from "./utils/sendResponse";
 import { Status } from "./schema/status.schema";
 import { orderHandler } from "./controllers/order.controller";
+import { orderRouter } from "./routes/order.routes";
+import { cancelOrderRouter } from "./routes/cancelorder.routes";
+import { getDepthRouter } from "./routes/getdepth.routes";
+import { getOrderbookRouter } from "./routes/getorderbook.routes";
 const app = express();
 
 app.use(express.json());
 
 
-
+console.log("server started")
 app.use(authRouter)
 // app.post("/login", loginHandler);
 
-app.post("/order", authMiddleware, orderHandler)
+app.use(orderRouter);
+
+app.use(cancelOrderRouter);
+
+app.use(getDepthRouter);
+
+app.use(getOrderbookRouter);
+
+
+
+
+
+
+
+// app.post("/order", authMiddleware, orderHandler)
 
 
 // app.post("/order/:ordertype");//put order LIMIT  || MARKET
