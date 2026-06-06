@@ -1,14 +1,16 @@
 import express from "express";
-import { loginHandler, signUpHandler } from "./controllers/authController";
+import "dotenv/config";
 
+//routers 
+import { authRouter } from "./routes/auth.routes";
 const app = express();
 
 app.use(express.json());
 
+console.log(process.env.DATABASE_URL)
 
-
-app.post("/signup",signUpHandler)
-app.post("/login", loginHandler);
+app.use(authRouter)
+// app.post("/login", loginHandler);
 
 
 // app.post("/order/:ordertype");//put order LIMIT  || MARKET
