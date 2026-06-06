@@ -8,8 +8,9 @@ export function generateToken( id: string )
 
 
 
-export function verifyToken( token: string)
+export  function verifyToken( token: string)
 {
-    const decoded  =  jwt.verify(token, SECRET) as JwtPayload;
+    const decoded  =   jwt.verify(token, SECRET) as JwtPayload;
+    
     return decoded.id;
 }

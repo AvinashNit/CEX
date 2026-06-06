@@ -18,10 +18,12 @@ on("error",(err)=>{console.log("Redis client error", err)})
 
 while(true)
 {
-    const orderReq  = await  orderSubscriber.brPop("order-queue", 2);
+    const orderReq  = await  orderSubscriber.brPop("order_queue", 0);
+    console.log(orderReq);
     if(orderReq)
     {
+        
         const orderFields =  JSON.parse(orderReq.element);
-        await responsePublisher.lPush("response-queue" , JSON.stringify({_identifier:orderFields._identifier, filled:2}));
+        await responsePublisher.lPush("response_queue" , JSON.stringify({id:orderFields.id, filled:2}));
     }
 }

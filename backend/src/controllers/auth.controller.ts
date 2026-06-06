@@ -6,7 +6,7 @@ import { Status } from "../schema/status.schema";
 import { sendResponse } from "../utils/sendResponse";
 import { prismaClient } from "../services/prismaClient.service";
 import { pushUserToDb, verifyUser } from "../services/user.service";
-import { AppError } from "../utils/appError";
+import { AppError } from "../utils/AppError";
 import { generateToken } from "../utils/token.gen.verify";
 
 
@@ -36,7 +36,10 @@ export async function loginHandler( req: express.Request , res: express.Response
     try{
         const id = await verifyUser(user.data);
         const token = generateToken(id);
+        console.log("token inside login handler "+ token);
         return sendResponse( res, Status.OK, "User logged in successfully", {token});
+        
+        
     }
     catch(err)
     {

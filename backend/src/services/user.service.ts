@@ -1,7 +1,7 @@
 import { prismaClient } from "./prismaClient.service";
 import type { User } from "../schema/user.schema";
 import { hashPassword } from "../utils/hash";
-import { AppError } from "../utils/appError";
+import { AppError } from "../utils/AppError";
 import bcrypt from "bcrypt";
 
 

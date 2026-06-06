@@ -1,0 +1,9 @@
+import { Router } from "express";
+import { orderHandler } from "../controllers/order.controller";
+import { authMiddleware } from "../middlewares/auth.middleware";
+
+const orderRouter =  Router();
+
+
+
+export { orderRouter }
