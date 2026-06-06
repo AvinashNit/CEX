@@ -6,11 +6,13 @@ import { Status } from "../schema/status.schema";
 import { sendResponse } from "../utils/sendResponse";
 import { prismaClient } from "../services/prismaClient.service";
 import { pushUserToDb } from "../services/user.service";
+import { AppError } from "../utils/appError";
 
-export async function signUpHandler(req: express.Request, res: express.Response ){
+
+export async function signUpHandler(req: express.Request, res: express.Response , next: express.NextFunction){
     const user = userSchema.safeParse({ email:req.body.email, password:req.body.password });
     if( !user.success )
-        return sendError( res , Status.BAD_REQUEST , "ValidationError", z.prettifyError(user.error));
+         throw new AppError( z.prettifyError(user.error));
     try{
         const newUser  =  await pushUserToDb({ email: user.data.email, password: user.data.password });
         return sendResponse( res, Status.CREATED , "User created" , {success: true, user:newUser});
@@ -18,7 +20,7 @@ export async function signUpHandler(req: express.Request, res: express.Response 
     }
     catch( err )
     {
-        return sendError( res, Status.BAD_REQUEST , "Servic Violation Error", err);
+         next(err);
     }
 
 }

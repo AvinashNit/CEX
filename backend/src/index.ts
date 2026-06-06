@@ -3,6 +3,7 @@ import "dotenv/config";
 
 //routers 
 import { authRouter } from "./routes/auth.routes";
+import { errorHandler } from "./middlewares/error.middleware";
 const app = express();
 
 app.use(express.json());
@@ -31,7 +32,7 @@ app.use(authRouter)
 
 
 
-
+app.use(errorHandler);
 
 
 
