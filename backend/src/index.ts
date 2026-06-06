@@ -4,18 +4,23 @@ import "dotenv/config";
 //routers 
 import { authRouter } from "./routes/auth.routes";
 import { errorHandler } from "./middlewares/error.middleware";
+import { authMiddleware } from "./middlewares/auth.middleware";
+import { sendResponse } from "./utils/sendResponse";
+import { Status } from "./schema/status.schema";
 const app = express();
 
 app.use(express.json());
 
-console.log(process.env.DATABASE_URL)
+
 
 app.use(authRouter)
 // app.post("/login", loginHandler);
 
 
 // app.post("/order/:ordertype");//put order LIMIT  || MARKET
-// app.get("/orders");//get all orders that i have put
+app.get("/orders", authMiddleware, (req, res)=>{
+    return sendResponse(res,Status.OK, "ya youhi tth " )
+});//get all orders that i have put
 // app.get("/order/:orderid");//particular order
 // app.get("/order/status/:orderid");//status of a particular order kind or redundant
 // app.get("/order/cancel/:orderid")//if order is still on order book
