@@ -2,7 +2,7 @@ import { prismaClient } from "./prismaClient.service";
 import type { User } from "../schema/user.schema";
 import { hashPassword } from "../utils/hash";
 import { AppError } from "../utils/appError";
-
+import bcrypt from "bcrypt";
 
 
 export async function pushUserToDb ( user : User ) {
@@ -31,4 +31,18 @@ export async function pushUserToDb ( user : User ) {
 }
     
     
-    
+export async function verifyUser( claimedUser : User)
+{
+    const storedUser = await prismaClient.user.findUnique({
+        where:{
+            email: claimedUser.email,
+        }
+    }) 
+    if(!storedUser)
+        throw new AppError("User not found");
+    const ifVerified =  await bcrypt.compare( claimedUser.password , storedUser.password);
+    if(!ifVerified)
+        throw new AppError("Invalid Password");
+    return storedUser.id;
+
+}
