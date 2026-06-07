@@ -4,13 +4,13 @@ import { AppError } from "../utils/AppError";
 import { pushRequestOrder } from "../redisService/redis.pushService";
 import { untilWeBack } from "../redisService/redis.listen.response";
 import { sendResponse } from "../utils/sendResponse";
-import { getDepthSchema } from "../schema/order.schema";
+import { getDepthSchema } from "../schema/general.schema";
 import { Status } from "../schema/status.schema";
 
 
 export async function getDepthHandler ( req: Request, res: Response)
 {
-    const symbol = req.params.symbol;
+    const symbol = req.params.symbol as string;
     const requestId = getId();
     const getDepthBody = getDepthSchema.safeParse({
         requestId ,
@@ -22,8 +22,8 @@ export async function getDepthHandler ( req: Request, res: Response)
     if(!getDepthBody.success)
         throw new AppError("failed pasing depth body");
 
-    await pushRequestOrder( getDepthBody.data );
+    await pushRequestOrder( getDepthBody.data,requestId );
 
-    await untilWeBack(requestId);
-    return sendResponse( res, Status.OK, "testing depth")
+    const response = await untilWeBack(requestId);
+    return sendResponse( res, Status.OK, "fetched depth successfully",response)
 }

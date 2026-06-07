@@ -74,11 +74,35 @@ const getOrderBook = z.object({
     
 })
 
+
+const updateBalanceSchema = z.object({
+    requestId: z.number(),
+    event: z.literal("UPDATE_BALANCE"),
+    data: z.object({
+        userId: z.string(),
+        asset: z.string(),
+        amount: z.number(),
+    })
+})
+
+
+const getbalanceSchema = z.object({
+    requestId: z.number(),
+    event: z.literal("GET_BALANCE"),
+    data:z.object({
+        userId: z.string(),
+        asset: z.string().optional(),
+    })
+})
+type  getbalancebody = z.infer<typeof getbalanceSchema>
+
+
 type createOrderbody = z.infer<typeof createOrderSchema>;
 type cancelOrderbody = z.infer< typeof cancelOrderSchema>;
 type getDepthbody = z.infer< typeof getDepthSchema>
 type getOrderBookbody = z.infer< typeof getOrderBook>
+type  updateBalancebody = z. infer<typeof updateBalanceSchema>
 
 
 
-export { createOrderSchema , cancelOrderSchema, getOrderBook,getDepthSchema, type createOrderbody, type cancelOrderbody, type getDepthbody , type getOrderBookbody};
+export { createOrderSchema , cancelOrderSchema, getOrderBook,getDepthSchema, type createOrderbody, type cancelOrderbody, type getDepthbody , type getOrderBookbody, type updateBalancebody,  updateBalanceSchema , getbalanceSchema, type getbalancebody};

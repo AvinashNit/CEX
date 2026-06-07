@@ -4,7 +4,7 @@ import { AppError } from "../utils/AppError";
 import { pushRequestOrder } from "../redisService/redis.pushService";
 import { untilWeBack } from "../redisService/redis.listen.response";
 import { sendResponse } from "../utils/sendResponse";
-import { getOrderBook } from "../schema/order.schema";
+import { getOrderBook } from "../schema/general.schema";
 import { Status } from "../schema/status.schema";
 
 
@@ -22,8 +22,9 @@ export async function getOrderBookHandler ( req: Request, res: Response)
     if(!orderbookBody.success)
         throw new AppError("failed parsing orderbook body");
 
-    await pushRequestOrder( orderbookBody.data );
+    await pushRequestOrder( orderbookBody.data,requestId );
 
     const responseback = await untilWeBack(requestId)
-    return sendResponse( res, Status.OK, "testing orderbook")
+    console.log("resolved")
+    return sendResponse( res, Status.OK, "fetched orderbook successfully", responseback)
 }

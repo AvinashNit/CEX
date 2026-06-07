@@ -3,10 +3,10 @@ import { orderPublisher as responseListener } from "./redis.createClient";
 let pendingResolveOrder = new Map<number, Function>;
 
 
-export function untilWeBack( id : number)
+export function untilWeBack(requestId : number)
 {
     return new Promise((resolveOrder, rejectOrder)=>{
-        pendingResolveOrder.set(id , resolveOrder);
+        pendingResolveOrder.set(requestId , resolveOrder);
     })
 }
 
@@ -17,11 +17,10 @@ async function main()
     const res = await responseListener.brPop("response_queue",0);
       {
         const parsedData = JSON.parse(res!.element);
-        console.log(parsedData)
         if(pendingResolveOrder.has(parsedData.id))
         {
             let resolve = pendingResolveOrder.get(parsedData.id);
-            resolve!(parsedData.filled);
+            resolve!(parsedData.data);
             pendingResolveOrder.delete(parsedData.id);
         }
 

@@ -1,5 +1,5 @@
 import  type { Request, Response } from "express";
-import { createOrderSchema, orderSchema } from "../schema/order.schema";
+import { createOrderSchema, orderSchema } from "../schema/general.schema";
 import { AppError } from "../utils/AppError";
 import z, { cuid2 } from "zod";
 import { getId } from "../utils/id.generate";
@@ -19,9 +19,10 @@ export async function orderHandler( req: Request, res: Response )
     const requestId = getId();
     const orderId = getId();
     const create_order_body =  createOrderSchema.safeParse({
-        requestId,
+        requestId: requestId,
         event: "CREATE_ORDER",
         data:{
+            userId: user_id,
             orderId,
             symbol,
             type,
@@ -37,10 +38,9 @@ export async function orderHandler( req: Request, res: Response )
         throw new AppError( z.prettifyError(create_order_body.error));
 
     
-    await pushRequestOrder(create_order_body.data);
-
+    await pushRequestOrder(create_order_body.data,requestId);
     const filled =  await untilWeBack( requestId );
-    sendResponse(res, Status.OK, "Order successfully placed", {filled, symbol , price});
-    return;
+    return sendResponse(res, Status.OK, "Order successfully placed", filled);
+    
 
 }
