@@ -1,0 +1,13 @@
+import express from "express";
+import  { type Request } from "express";
+
+
+declare global {
+    namespace Express {
+      interface Request {
+        userId?: string;
+      }
+    }
+  }
+  
+  export {};

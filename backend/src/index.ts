@@ -1,73 +1,99 @@
-import express from "express";
-import "dotenv/config";
+// import express from "express";
 
-//routers 
-import { authRouter } from "./routes/auth.routes";
-import { errorHandler } from "./middlewares/error.middleware";
-import { authMiddleware } from "./middlewares/auth.middleware";
-import { sendResponse } from "./utils/sendResponse";
-import { Status } from "./schema/status.schema";
-import { orderHandler } from "./controllers/order.controller";
-import { orderRouter } from "./routes/order.routes";
-import { cancelOrderRouter } from "./routes/cancelorder.routes";
-import { getDepthRouter } from "./routes/getdepth.routes";
-import { getOrderbookRouter } from "./routes/getorderbook.routes";
-import { balanceRouter } from "./routes/balance.routes";
+
+// const app =  express();
+
+
+
+
+
+
+
+
+
+
+// POST /order
+// GET /depth/:symbol
+// GET /balance
+// GET /order/:orderId
+// DELETE /order/:orderId
+
+
+// GET /depth/:symbol
+
+// GET /balance
+
+// GET /balance// "orderId":"<order-id>",
+// "side":"buy",
+// "type":"limit",
+// "symbol":"BTC",
+// "price":100,
+// "qty":5,
+// "filledQty":0,
+// "status":"open",
+// "fills": []
+// }
+
+// "error":"order not found"
+// "error":"order not found"
+
+
+// DELETE /order/:orderId//"error":"filled orders cannot be cancelled"
+
+
+
+
+
+// app.use(( err, req, res, next )=>{
+//     return res.status()
+// })
+
+
+
+// app.listen( process.env.PORT || 3000 ,()=>{
+//     console.log(`Server running on port ${process.env.PORT || 3000}`)
+// })
+
+
+
+
+import express from  "express";
+import cors from "cors";
+import { sendToEngine } from "../services/redis-client-service";
+import { listenToEngineResponse } from "../services/pending-response";
+
+
 const app = express();
 
-app.use(express.json());
+listenToEngineResponse();
+app.use(express());
+app.use(cors())
 
 
-console.log("server started")
-app.use(authRouter)
-// app.post("/login", loginHandler);
+app.use( async (req, res)=>{
+    const time = Date.now()
+    console.log()
+    const response  = await sendToEngine("create_order" , {
+        symbol:"BTC",
+        side:"buy",
+        type:"limit",
+        price:100,
+        qty:5
+    })    
+    const time2 = Date.now();
+    console.log("time taken to push to push to redis" ,time2 - time );
 
-app.use(orderRouter);
+     res.json(response);
 
-app.use(cancelOrderRouter);
+     console.log("time taken to get response from engine", Date.now() - time2)
+     return ;
 
-app.use(getDepthRouter);
-
-app.use(getOrderbookRouter);
-
-
-app.use(balanceRouter);
-
-
-
-
-// app.post("/order", authMiddleware, orderHandler)
-
-
-// app.post("/order/:ordertype");//put order LIMIT  || MARKET
-// app.get("/orders", authMiddleware, (req, res)=>{
-    // return sendResponse(res,Status.OK, "ya youhi tth " )
-//get all orders that i have put
-// app.get("/order/:orderid");//particular order
-// app.get("/order/status/:orderid");//status of a particular order kind or redundant
-// app.get("/order/cancel/:orderid")//if order is still on order book
-// app.get("/order/fill/:orderid");// fill or a market order
-
-
-// app.get("/orderbook/:market");
-// app.get("/depth/:market");
-
-
-// app.get("/balance");
-// app.post("/balance");
+})
 
 
 
 
-app.use(errorHandler);
-
-
-
-
-
-
-
-
-app.listen(process.env.PORT || 3000,()=>{
-    console.log(`Server running over port ${process.env.PORT || 3000}`);
+app.listen(3000, ()=>{
+    console.log("Server running");
+    console.log(process.cwd());
 })
